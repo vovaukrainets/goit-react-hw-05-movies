@@ -2,6 +2,7 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { getMovieByQuery } from 'Api/Api';
 import { useEffect, useState } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
+import noPoster from '../../imgages/images.jpg';
 import {
   GridList,
   GalleryCard,
@@ -13,7 +14,7 @@ import {
   CardRate,
 } from 'page/homePage/HomePage.styled';
 import { Form, Input, Button } from './SearcMovies.styled';
-import { Link } from 'content/Content.styled';
+import { Link } from 'layout/Content.styled';
 
 export default function Movies() {
   const [movies, setMovies] = useState([]);
@@ -41,6 +42,7 @@ export default function Movies() {
       return;
     }
     setStatus('pending');
+
     getMovieByQuery(searchQuery).then(response => {
       if (response.length === 0) {
         Notify.failure('Write the correct Movie name,please', {
@@ -58,6 +60,7 @@ export default function Movies() {
   }, [searchQuery]);
 
   const handleSubmit = e => {
+    e.stopPropagation();
     e.preventDefault();
     setSearchQuery(inputValue);
     if (inputValue.trim() === '') {
@@ -70,13 +73,13 @@ export default function Movies() {
       return;
     }
 
-    setSearchParam({ query: inputValue });
+    setSearchParam({ query: inputValue.trim() });
     setInputValue('');
   };
 
   return (
     <>
-      <Form>
+      <Form onSubmit={handleSubmit}>
         <Input
           placeholder="Search movie"
           type="text"
@@ -84,9 +87,7 @@ export default function Movies() {
           onChange={getInputValue}
         />
 
-        <Button type="submit" onClick={handleSubmit}>
-          Search
-        </Button>
+        <Button type="submit">Search</Button>
       </Form>
       <GridContainer>
         {status === 'resolved' && (
@@ -104,7 +105,7 @@ export default function Movies() {
                       src={
                         poster_path
                           ? `https://image.tmdb.org/t/p/w500/${poster_path}`
-                          : 'noPoster'
+                          : noPoster
                       }
                     />
                   </GalleryImg>

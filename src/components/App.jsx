@@ -1,18 +1,29 @@
 import { Routes, Route } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import ContentPage from 'layout/Content';
+import Loader from './Spinner/Loader';
 
-import ContentPage from 'content/Content';
-import HomePage from 'page/homePage/HomePage';
-import Movies from 'page/SearcMovies/SearcMovies';
+const HomePage = lazy(() => import('../page/homePage/HomePage'));
+const Movies = lazy(() => import('../page/SearcMovies/SearcMovies'));
+const MovieAbout = lazy(() => import('../page/moviesAbout/MovieAbout'));
+const Cast = lazy(() => import('../page/cast/Cast'));
+const Reviews = lazy(() => import('../page/Reviews/Reviews'));
 
 export const App = () => {
   return (
     <>
       <ContentPage />
-      <Routes>
-        <Route index element={<HomePage />}></Route>
-        <Route path="movies" exact element={<Movies />} />
-        <Route path="*" element={<HomePage />} />
-      </Routes>
+      <Suspense fallback={<Loader />}>
+        <Routes>
+          <Route index element={<HomePage />} />
+          <Route path="movies" exact element={<Movies />} />
+          <Route path="movies/:moviesId" element={<MovieAbout />}>
+            <Route path="movies/:moviesId/reviews" element={<Reviews />} />
+            <Route path="movies/:moviesId/cast" element={<Cast />} />
+          </Route>
+          <Route path="*" element={<HomePage />} />
+        </Routes>
+      </Suspense>
     </>
   );
 };
